@@ -1,0 +1,282 @@
+--Task1
+--DDL sales_transaction
+CREATE TABLE sales_transactions (
+    transaction_id SERIAL PRIMARY KEY,
+    product_code VARCHAR(10),
+    customer_email VARCHAR(100),
+    sale_date TEXT,  
+    amount TEXT,     
+    payment_status VARCHAR(20)
+);
+
+
+--Sample Data
+INSERT INTO sales_transactions (transaction_id, product_code, customer_email, sale_date, amount, payment_status) VALUES
+(1, 'p001', 'ali@gmail.com', '2024-07-01', '1,000', 'Paid'),
+(2, 'P001', 'ali@gmail.com', '2024-07-01', '1,000', 'Paid'),
+(3, 'p002', 'nabila@outlook.com', '2024/07/02', '500', 'paid'),
+(4, 'P003', NULL, '01-07-2024', '150', 'Failed'),
+(5, 'P003', 'sara@domain.com', '2024-07-03', '150', NULL),
+(6, 'P003', 'sara@domain.com', '2024-07-03', '150.00', 'failed'),
+(7, 'p002', NULL, '2024-13-01', '0', 'Paid'),
+(8, 'p002', 'abir@example.com', '2024-07-15', '0', 'Completed'),
+(9, 'p001', 'ovi@example.com', '2024-07-20', '1,200.00', 'paid'),
+(10, 'P001', 'ovi@example.com', '2024-07-20', '1,200', 'paid');
+
+
+--SELECT * FROM sales_transactions;
+
+
+--DDL products_catalog
+CREATE TABLE products_catalog (
+  product_code TEXT PRIMARY KEY,
+  product_name TEXT NOT NULL,
+  category TEXT NOT NULL
+);
+
+--Sample data products_catalog
+INSERT INTO products_catalog (product_code, product_name, category) VALUES
+('P003', 'Office Chair', 'Furniture'),
+('P001', 'Laptop Model A', 'Electronics'),
+('P002', 'Smartphone X', 'Electronics');
+
+
+--Clean and standardize the sales_transactions data. 
+--  Standardize product_code
+UPDATE sales_transactions
+SET product_code = UPPER(product_code);
+
+
+--Fix Date
+UPDATE sales_transactions
+SET sale_date = TO_CHAR(TO_DATE(sale_date, 'DD-MM-YYYY'), 'YYYY-MM-DD')
+WHERE sale_date ~ '^\d{2}-\d{2}-\d{4}$';
+
+
+UPDATE sales_transactions
+SET sale_date = REPLACE(sale_date, '/', '-')
+WHERE sale_date ~ '^\d{4}/\d{2}/\d{2}$';
+
+
+UPDATE sales_transactions
+SET sale_date = TO_CHAR(
+    TO_DATE(
+      SUBSTRING(sale_date, 1, 4) || '-' ||  -- year
+      SUBSTRING(sale_date, 9, 2) || '-' ||  -- month (from day position)
+      SUBSTRING(sale_date, 6, 2),            -- day (from month position)
+      'YYYY-MM-DD'),
+    'YYYY-MM-DD')
+WHERE sale_date ~ '^\d{4}-\d{2}-\d{2}$'
+  AND SUBSTRING(sale_date, 6, 2)::INT > 12;
+
+
+
+--Fix amount field
+ALTER TABLE sales_transactions
+ALTER COLUMN amount TYPE NUMERIC(10,2)
+USING NULLIF(REPLACE(amount, ',', ''), '')::NUMERIC;
+
+
+--Fix Payment Status
+UPDATE sales_transactions
+SET payment_status = INITCAP(LOWER(payment_status))
+WHERE payment_status IS NOT NULL;
+
+
+
+
+--Remove duplicate transactions.
+CREATE TABLE duplicate_transactions_backup AS
+SELECT *
+FROM (
+    SELECT *,
+           ROW_NUMBER() OVER (
+               PARTITION BY 
+                   COALESCE(product_code, '##NULL'),
+                   COALESCE(customer_email, '##NULL'),
+                   COALESCE(CAST(sale_date AS TEXT), '##NULL'),
+                   COALESCE(CAST(amount AS TEXT), '##NULL')
+               ORDER BY transaction_id
+           ) AS rn
+    FROM sales_transactions
+) t
+WHERE rn > 1;
+
+DELETE FROM sales_transactions
+WHERE transaction_id IN (
+    SELECT transaction_id FROM duplicate_transactions_backup
+);
+                                                                        
+
+
+
+
+
+--Calculate total revenue per product category where payment_status is 'Paid'.
+SELECT 
+    p.category,
+    SUM(s.amount) AS total_revenue
+FROM 
+    sales_transactions s
+JOIN 
+    products_catalog p ON s.product_code = p.product_code
+WHERE 
+    s.payment_status = 'Paid'
+GROUP BY 
+    p.category
+ORDER BY 
+    total_revenue DESC;
+
+
+
+
+--Report how many duplicate transactions were removed.
+SELECT COUNT (*) AS duplicate_transaction_report FROM duplicate_transactions_backup;
+
+
+
+
+
+
+--Task2 
+-- DDL customers table
+CREATE TABLE customers (
+    customer_id INT PRIMARY KEY,
+    name VARCHAR(100),
+    region VARCHAR(50),
+    signup_date DATE
+);
+
+-- DDL orders table
+CREATE TABLE orders (
+    order_id INT PRIMARY KEY,
+    customer_id INT,
+    order_date DATE,
+    total_amount INT,
+    FOREIGN KEY (customer_id) REFERENCES customers(customer_id)
+);
+
+
+-- DDL order_item table
+CREATE TABLE order_items (
+    item_id INT PRIMARY KEY,
+    order_id INT,
+    product_name VARCHAR(100),
+    quantity INT,
+    unit_price DECIMAL INT,
+    FOREIGN KEY (order_id) REFERENCES orders(order_id)
+);
+
+
+-- sample data customers table
+INSERT INTO customers (customer_id, name, region, signup_date) VALUES
+(1, 'Alice', 'Dhaka', '2023-01-10'),
+(2, 'Bob', 'Chittagong', '2023-02-15'),
+(3, 'Carol', 'Dhaka', '2023-03-05'),
+(4, 'David', 'Dhaka', '2023-04-01'),
+(5, 'Eve', 'Sylhet', '2023-05-20'),
+(6, 'Frank', 'Dhaka', '2023-06-01'),
+(7, 'Grace', 'Dhaka', '2023-06-15'),
+(8, 'Hannah', 'Dhaka', '2023-07-01');
+
+
+
+-- sample data orders table
+INSERT INTO orders (order_id, customer_id, order_date, total_amount) VALUES
+(100, 1, '2024-06-01', 600),
+(101, 1, '2024-07-15', 500),
+(102, 3, '2024-07-10', 1200),
+(103, 4, '2024-07-12', 0),
+(104, 2, '2024-07-05', 300),
+(105, 6, '2024-07-01', 600),
+(106, 6, '2024-07-10', 400),
+(107, 7, '2024-07-05', 300),
+(108, 7, '2024-07-15', 800),
+(109, 8, '2024-07-20', 0),
+(110, 8, '2024-07-22', 0);
+
+
+
+
+-- sample data order_items table
+INSERT INTO order_items (item_id, order_id, product_name, quantity, unit_price) VALUES
+(1000, 100, 'Laptop Model A', 1, 600),
+(1001, 101, 'Smartphone X', 1, 500),
+(1002, 102, 'Office Chair', 2, 600),
+(1003, 102, 'Desk Lamp', 1, 0),
+(1004, 104, 'Notebook', 3, 100),
+(1005, 105, 'Desk Lamp', 1, 600),
+(1006, 106, 'Notebook', 1, 400),
+(1007, 107, 'Laptop Model A', 1, 300),
+(1008, 108, 'Laptop Model A', 1, 800);
+
+
+
+-- Find customers from Dhaka who have at least 2 orders, spent over 1000 in total, and bought at 
+-- least 2 different products.
+SELECT 
+    c.customer_id,
+    c.name,
+    COUNT(DISTINCT o.order_id) AS total_orders,
+    SUM(o.total_amount) AS total_spent,
+    COUNT(DISTINCT oi.product_name) AS different_products
+FROM 
+    customers c
+JOIN 
+    orders o ON c.customer_id = o.customer_id
+JOIN 
+    order_items oi ON o.order_id = oi.order_id
+	WHERE 
+    c.region = 'Dhaka'
+
+GROUP BY 
+    c.customer_id, c.name
+HAVING 
+    COUNT(DISTINCT o.order_id) >= 2
+    AND SUM(o.total_amount) > 1000
+    AND COUNT(DISTINCT oi.product_name) >= 2;
+
+
+
+
+
+-- List their name, number of orders, total spent, and first order date.
+SELECT 
+    c.name,
+    COUNT(DISTINCT o.order_id) AS number_of_orders,
+    SUM(o.total_amount) AS total_spent,
+    MIN(o.order_date) AS first_order_date
+FROM 
+    customers c
+JOIN 
+    orders o ON c.customer_id = o.customer_id
+JOIN 
+    order_items oi ON o.order_id = oi.order_id
+WHERE 
+    c.region = 'Dhaka'
+GROUP BY 
+    c.customer_id, c.name
+HAVING 
+    COUNT(DISTINCT o.order_id) >= 2
+    AND SUM(o.total_amount) > 1000
+    AND COUNT(DISTINCT oi.product_name) >= 2;
+
+
+
+
+
+-- Identify customers who signed up but never made a purchase.
+SELECT 
+    c.customer_id,
+    c.name,
+    c.region,
+    c.signup_date
+FROM 
+    customers c
+LEFT JOIN 
+    orders o ON c.customer_id = o.customer_id
+WHERE 
+    o.order_id IS NULL;
+
+
+
