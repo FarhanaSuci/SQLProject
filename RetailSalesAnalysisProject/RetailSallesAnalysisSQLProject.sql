@@ -122,5 +122,17 @@ SELECT
   COUNT(DISTINCT(customer_id)) AS totalCustomer 
   FROM retail_sales;
 
+---Data Analysis & Business Key Problems & Answers
+
+
+--1.Write a SQL Query to retrieve all customers for sales made on "2022-11-05"
+
+SELECT *
+FROM retail_sales 
+WHERE sale_date ='2022-11-05';
+
+--2.Write a SQL Query to retrieve all transactions where the Category is Clothing and the Quantity 
+--sold is more than 10  in the month of  Nov-2022
+
 	
 
