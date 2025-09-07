@@ -167,3 +167,53 @@ SELECT ROUND(AVG(age),2) AS  AvrageAge
 FROM retail_sales
 WHERE category = 'Beauty';
 
+--Q5. Write a SQL query to find all transactions where the total_sale is greater than 1000.
+SELECT * FROM retail_sales
+WHERE total_sale >  1000;
+
+--Q6. Write a SQL query to find the total number of transactions (transaction-id) made by each gender
+--in each category
+SELECT category, gender , COUNT(*) as total_transactions
+FROM retail_sales
+GROUP BY
+category,gender;
+
+---Order it BY category
+SELECT category, gender , COUNT(*) as total_transactions
+FROM retail_sales
+GROUP BY
+category,gender
+ORDER BY 1;
+
+--Q7. Write a SQL query to calculate the average sale for each month . Find out best selling month 
+--in each year 
+SELECT 
+    EXTRACT(YEAR FROM sale_date) as year,
+	EXTRACT(MONTH FROM sale_date) as month,
+	AVG(total_sale) AS avg_sale
+	FROM retail_sales
+	GROUP BY 1,2
+	ORDER BY 1,2;
+
+SELECT 
+    EXTRACT(YEAR FROM sale_date) as year,
+	EXTRACT(MONTH FROM sale_date) as month,
+	AVG(total_sale) AS avg_sale
+	FROM retail_sales
+	GROUP BY 1,2
+	ORDER BY 1,3 DESC;
+
+SELECT 
+    EXTRACT(YEAR FROM sale_date) as year,
+	EXTRACT(MONTH FROM sale_date) as month,
+	AVG(total_sale) AS avg_sale,
+	RANK() OVER(PARTITION BY EXTRACT(YEAR FROM sale_date) ORDER BY AVG(total_sale) DESC )
+	FROM retail_sales
+	GROUP BY 1,2
+	ORDER BY 1,3 DESC;
+
+	
+	
+
+
+
