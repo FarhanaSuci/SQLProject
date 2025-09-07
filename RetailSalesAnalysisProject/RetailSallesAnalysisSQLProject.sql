@@ -132,7 +132,38 @@ FROM retail_sales
 WHERE sale_date ='2022-11-05';
 
 --2.Write a SQL Query to retrieve all transactions where the Category is Clothing and the Quantity 
---sold is more than 10  in the month of  Nov-2022
+--sold is more than 4  in the month of  Nov-2022
+SELECT 
+  category,
+  SUM(quantiy)
+FROM retail_sales
+WHERE category = 'Clothing'
+GROUP BY 1;
 
-	
+
+SELECT 
+  category,
+  SUM(quantiy)
+FROM retail_sales
+WHERE category = 'Clothing'
+GROUP BY 1;
+    
+SELECT * 
+FROM retail_sales
+WHERE category = 'Clothing'
+AND 
+TO_CHAR(sale_date,'YYYY-MM') = '2022-11'
+AND
+quantiy >= 4; 
+
+--Q3. Write a SQL Query to calculate the total sales (total_sale) for each category
+SELECT category, SUM(total_sale) as Net_sale , COUNT(*) AS TotalOrders
+FROM retail_sales
+GROUP BY 1;
+
+--Q4. Write a SQL Query to find the average age of customers who purchased items from the Beauty Category 
+
+SELECT ROUND(AVG(age),2) AS  AvrageAge
+FROM retail_sales
+WHERE category = 'Beauty';
 
