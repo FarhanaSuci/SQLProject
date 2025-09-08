@@ -209,11 +209,58 @@ SELECT
 	AVG(total_sale) AS avg_sale,
 	RANK() OVER(PARTITION BY EXTRACT(YEAR FROM sale_date) ORDER BY AVG(total_sale) DESC )
 	FROM retail_sales
-	GROUP BY 1,2
-	ORDER BY 1,3 DESC;
+	GROUP BY 1,2;
 
+--Create another table
+
+SELECT * FROM
+    (
+	SELECT
+    EXTRACT(YEAR FROM sale_date) as year,
+	EXTRACT(MONTH FROM sale_date) as month,
+	AVG(total_sale) AS avg_sale,
+	RANK() OVER(PARTITION BY EXTRACT(YEAR FROM sale_date) ORDER BY AVG(total_sale) DESC )
+	FROM retail_sales
+	GROUP BY 1,2) as t1
+	WHERE rank=1;
+
+SELECT year,month,avg_sale FROM
+    (
+	SELECT
+    EXTRACT(YEAR FROM sale_date) as year,
+	EXTRACT(MONTH FROM sale_date) as month,
+	AVG(total_sale) AS avg_sale,
+	RANK() OVER(PARTITION BY EXTRACT(YEAR FROM sale_date) ORDER BY AVG(total_sale) DESC )
+	FROM retail_sales
+	GROUP BY 1,2) as t1
+	WHERE rank=1;
 	
-	
+--Question 8. Write a SQL query to find the top 5 customers based on the highest total sales
+
+SELECT customer_id,
+SUM(total_sale) AS TotalSales
+FROM retail_sales
+GROUP BY customer_id
+ORDER BY SUM(total_sale) DESC
+LIMIT 5;
+
+--Question 9. Write a SQL query to find the number of unique customers who purchased  items from
+--each category 
+
+SELECT category, 
+COUNT(DISTINCT(customer_id)) 
+AS Unique_Customers
+FROM retail_sales
+GROUP BY category;
+
+
+--Q.10. Write a SQL query to create each shift and number of orders 
+--(Example Morning <= 12, Afternoon Between 12 & 17 ),.Evening > 17
+
+SELECT EXTRACT(HOUR FROM CURRENT_TIME);--Extract our from my system
+
+SELECT * FROM retail_sales;
+
 
 
 
