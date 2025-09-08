@@ -261,6 +261,27 @@ SELECT EXTRACT(HOUR FROM CURRENT_TIME);--Extract our from my system
 
 SELECT * FROM retail_sales;
 
+WITH Hourly_sale 
+AS
+(
+SELECT *,
+    CASE 
+	  WHEN EXTRACT(HOUR FROM sale_time) < 12 THEN 'Morning'
+	  WHEN EXTRACT(HOUR FROM sale_time) BETWEEN 12 AND 17 THEN 'Afternoon'
+	  ELSE 'Evening'
+	  END AS shift
+FROM retail_sales
+)
+SELECT 
+shift,
+COUNT(*) AS Total_orders
+FROM Hourly_sale
+GROUP BY shift;
+
+---End OF Project
+	  
+
+
 
 
 
