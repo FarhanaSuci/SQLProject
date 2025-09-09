@@ -24,6 +24,9 @@ CREATE TABLE branch
 
    );
 
+ALTER TABLE branch
+ALTER COLUMN contact_no TYPE VARCHAR(20);
+
 --Creating Employees Table
 DROP TABLE IF EXISTS employees ;
 CREATE TABLE employees(
@@ -40,7 +43,7 @@ DROP TABLE IF EXISTS books;
 CREATE TABLE books(
 isbn VARCHAR(20) PRIMARY KEY,
 book_title VARCHAR(75),
-category  VARCHAR(10),	
+category  VARCHAR(25),	
 rental_price FLOAT,
 status    VARCHAR(15),
 author  VARCHAR(35),
@@ -48,6 +51,9 @@ publisher VARCHAR(55)
 
 
 );
+
+ALTER TABLE books
+ALTER COLUMN category TYPE VARCHAR(20);
 
 --Creating Members Table
 DROP TABLE IF EXISTS members;
@@ -118,5 +124,10 @@ ALTER TABLE return_status
 ADD CONSTRAINT fk_issued_status
 FOREIGN KEY (issued_id)
 REFERENCES issued_status(issued_id);
+
+SELECT * FROM issued_status;
+DELETE FROM issued_status;
+
+SELECT * FROM return_status;
 
 
