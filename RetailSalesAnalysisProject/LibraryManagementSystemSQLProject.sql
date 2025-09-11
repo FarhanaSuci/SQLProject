@@ -240,5 +240,21 @@ branch.manager_id=e2.emp_id
 
 SELECT * FROM manager_employee_information;
 
-Task 11. Create a Table of Books with Rental Price Above a Certain Threshold:
+--Task 11. Create a Table of Books with Rental Price Above a Certain Threshold ( Here I supposed 8)
+
+SELECT * FROM books
+WHERE rental_price >= 8;
+
+--Task 12: Retrieve the List of Books Not Yet Returned
+SELECT * FROM return_status;
+SELECT * FROM issued_status;
+SELECT * FROM books;
+
+
+SELECT ist.issued_book_name AS Book_title FROM issued_status as ist
+LEFT JOIN return_status as rs
+ON rs.issued_id = ist.issued_id
+WHERE rs.return_id IS NULL
+
+
 
