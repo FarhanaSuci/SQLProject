@@ -275,7 +275,9 @@ Display the member's_id, member's name, book title, issue date, and days overdue
 --Filter books which is return 
 --- overdue > 30
 
-SELECT m.member_id,m.member_name,b.book_title,ist.issued_date, (return_date - issued_date) AS Overdue_in_Days
+--(return_date - issued_date) AS Overdue_in_Days
+SELECT m.member_id,m.member_name,b.book_title,ist.issued_date,
+(CURRENT_DATE - issued_date) AS Overdue_in_Days
 FROM 
 issued_status AS ist
 JOIN
@@ -285,5 +287,47 @@ JOIN books as b
 ON ist.issued_book_isbn =b.isbn 
 LEFT JOIN return_status as r
 ON r.issued_id = ist.issued_id
-WHERE return_date - issued_date > 30 ;
+WHERE  r.return_date IS NULL
+AND (CURRENT_DATE - issued_date) >30
+ORDER BY 1;
+
+/*
+Task 14: Branch Performance Report
+Create a query that generates a performance report for each branch, showing the number of books issued,
+the number of books returned, and the total revenue generated from book rentals.
+*/
+SELECT * FROM branch;
+SELECT * FROM books;
+SELECT * FROM issued_status;
+select * FROM employees;
+SELECT * FROM return_status;
+
+CREATE TABLE 
+branch_report
+AS
+SELECT b.branch_id, COUNT(ist.issued_id) AS number_of_books_issued, COUNT(rs.return_id) 
+AS number_of_books_returned ,SUM(bo.rental_price) AS total_revenue
+FROM 
+branch as b
+JOIN 
+employees as e
+ON b.branch_id = e.branch_id
+JOIN
+issued_status 
+AS ist
+ON
+ist.issued_emp_id = e.emp_id
+LEFT JOIN 
+return_status AS rs
+ON 
+ist.issued_id = rs.issued_id
+JOIN 
+books as bo
+ON
+ist.issued_book_isbn=bo.isbn
+GROUP BY 1
+ORDER BY SUM(bo.rental_price) DESC
+;
+SELECT * FROM branch_report;
+
 
