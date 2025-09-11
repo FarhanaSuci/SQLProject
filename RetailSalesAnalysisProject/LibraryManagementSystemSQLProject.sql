@@ -188,4 +188,57 @@ GROUP BY 1,2;
 
 SELECT * FROM issued_book_counts;
 
+---Task 7. Retrieve All Books in a Specific Category:
+SELECT * FROM books
+WHERE  category = 'Horror';
+
+--Find Total Rental Income by Category:
+SELECT * FROM books
+SELECT * FROM issued_status
+
+SELECT category,SUM(rental_price) AS Total_Rental_Price,COUNT(*)AS no_of_times_issued  FROM books
+JOIN issued_status
+ON issued_status.issued_book_isbn = books.isbn
+GROUP BY category;
+
+--Task-9. List Members Who Registered in the Last 180 Days:
+SELECT * FROM members
+WHERE
+CURRENT_DATE-reg_date <= 180 ;
+
+INSERT INTO members(member_id,member_name,member_address,reg_date)
+VALUES
+('F102','Farhana Akter Suci','Noakhali','2025-08-15'),
+('F103','Sharmin Sumi','Noakhali','2025-08-18'),
+('F104','Arman Islam Ajmir','Noakhali','2025-08-20');
+
+SELECT * FROM members;
+
+
+--Task 10: List Employees with Their Branch Manager's Name and their branch details:
+SELECT * FROM branch ;
+SElECT * FROM employees;
+
+SELECT branch.manager_id,employees.emp_name,branch.branch_id,branch.branch_address
+FROM branch
+JOIN
+employees
+ON
+branch.branch_id=employees.branch_id
+GROUP BY (branch.manager_id,employees.emp_name,branch.branch_id,branch.branch_address);
+
+SELECT e2.emp_name AS manager_name, e1.emp_name,branch.branch_id,branch.branch_address
+FROM branch
+JOIN
+employees as e1
+ON
+branch.branch_id=e1.branch_id
+JOIN
+employees as e2
+ON
+branch.manager_id=e2.emp_id
+
+SELECT * FROM manager_employee_information;
+
+Task 11. Create a Table of Books with Rental Price Above a Certain Threshold:
 
