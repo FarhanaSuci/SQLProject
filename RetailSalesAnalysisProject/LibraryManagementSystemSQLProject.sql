@@ -127,7 +127,17 @@ REFERENCES issued_status(issued_id);
 
 SELECT * FROM issued_status;
 DELETE FROM issued_status;
-
+--Just show the tables
+SELECT * FROM issued_status;
 SELECT * FROM return_status;
+SELECT * FROM books;
+SELECT * FROM branch;
+SELECT * FROM employees;
+
+--Project Task
+
+---CRUD Operations
+
+
 
 
