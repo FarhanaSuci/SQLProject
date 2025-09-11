@@ -168,8 +168,24 @@ WHERE issued_emp_id = 'E101';
 --Task 5: List Members Who Have Issued More Than One Book 
 --  Use GROUP BY to find members who have issued more than one book.
 SELECT issued_emp_id, COUNT(issued_id) as Total_book_issued FROM issued_status
-GROUP BY (issued_emp_id);
+GROUP BY (issued_emp_id)
+Having COUNT(issued_id) >1 ;
 
 --Task 6: Create 
 --Summary Tables: Used CTAS to generate new tables based on query results -
 --each book and total book_issued_cnt**
+SELECT * FROM issued_status
+
+CREATE TABLE issued_book_counts
+AS
+SELECT b.isbn,b.book_title,COUNT(issued_book_isbn) as No_of_issues FROM books as b
+JOIN issued_status as ist
+ON ist.issued_book_isbn = b.isbn 
+GROUP BY 1,2;
+
+
+--Check it
+
+SELECT * FROM issued_book_counts;
+
+
