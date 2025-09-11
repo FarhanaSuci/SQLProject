@@ -330,4 +330,29 @@ ORDER BY SUM(bo.rental_price) DESC
 ;
 SELECT * FROM branch_report;
 
+/*
+Task 15: Find Employees with the Most Book Issues Processed
+Write a query to find the top 3 employees who have processed the most book issues.
+Display the employee name, number of books processed, and their branch.*/
+
+SELECT * FROM branch;
+SELECT * FROM books;
+SELECT * FROM issued_status;
+select * FROM employees;
+SELECT * FROM return_status;
+
+
+
+SELECT 
+    e.emp_name,
+    COUNT(ist.issued_id) AS No_of_books,
+    b.branch_id
+FROM branch AS b
+JOIN employees AS e
+    ON b.branch_id = e.branch_id
+JOIN issued_status AS ist
+    ON ist.issued_emp_id = e.emp_id
+GROUP BY e.emp_name, b.branch_id
+ORDER BY COUNT(ist.issued_id) DESC
+LIMIT 3;
 
