@@ -98,6 +98,20 @@ AND
 GROUP BY ct.city_name
 ORDER BY 2 DESC;
 
+-- Q.3
+-- Sales Count for Each Product
+-- How many units of each coffee product have been sold?
+
+SELECT * FROM products;
+SELECT * FROM sales;
+
+SELECT p.product_name,COUNT(s.sale_id) AS total_unit FROM
+products as p
+JOIN
+sales AS  s
+ON p.product_id = s.product_id
+GROUP BY p.product_id
+ORDER BY 2 DESC;
 
 
 
