@@ -70,6 +70,34 @@ ORDER BY 2 DESC;
 -- What is the total revenue generated from coffee sales across all cities in the last quarter of 2023?
 
 
+SELECT * FROM  sales;
+
+
+SELECT * , EXTRACT(YEAR FROM sale_date) AS year, EXTRACT(quarter FROM sale_date) AS quarter
+FROM sales
+WHERE 
+EXTRACT(YEAR FROM sale_date) = 2023
+AND 
+	EXTRACT(quarter FROM sale_date) = 4;
+
+
+
+
+
+SELECT ct.city_name ,SUM(total) AS Total_revenue
+FROM sales AS s
+JOIN 
+customers AS c
+ON s.customer_id = c.customer_id
+JOIN city AS ct
+ON ct.city_id = c.city_id
+WHERE 
+EXTRACT(YEAR FROM sale_date) = 2023
+AND 
+	EXTRACT(quarter FROM sale_date) = 4
+GROUP BY ct.city_name
+ORDER BY 2 DESC;
+
 
 
 
