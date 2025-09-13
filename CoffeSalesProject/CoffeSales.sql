@@ -114,6 +114,36 @@ GROUP BY p.product_id
 ORDER BY 2 DESC;
 
 
+-- Q.4
+-- Average Sales Amount per City
+-- What is the average sales amount per customer in each city?
 
 
 
+--city , total sales , 
+-- No. of customers each types of city 
+
+SELECT c.city_name,SUM(s.total)AS total_sales,
+
+    ROUND(
+        SUM(s.total)::numeric/
+		   COUNT(DISTINCT s.customer_id)::numeric
+		   ,2) AS Averge_Sales_Per_Customer
+
+,COUNT(DISTINCT cu.customer_id) AS total_customers FROM
+city AS c
+JOIN customers AS cu
+ON c.city_id = cu.city_id
+JOIN 
+sales AS s
+ON s.customer_id = cu.customer_id
+GROUP BY c.city_name 
+ORDER BY AVG(s.total) DESC;
+
+
+
+
+SELECT * FROM city ;
+SELECT * FROM products;
+SELECT * FROM customers;
+SELECT * FROM sales;
