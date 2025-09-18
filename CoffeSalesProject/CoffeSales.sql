@@ -166,4 +166,46 @@ JOIN customers as cu
 ON ci.city_id = cu.city_id
 GROUP BY(ci.city_name,ci.population)
 
+-- -- Q6
+-- Top Selling Products by City
+-- What are the top 3 selling products in each city based on sales volume?
+SELECT * FROM city ;
+SELECT * FROM products;
+SELECT * FROM customers;
+SELECT * FROM sales;
+
+
+
+SELECT 
+    p.product_name,ci.city_name,
+    COUNT(DISTINCT s.sale_id) AS total_sales
+FROM products AS p
+JOIN sales AS s
+    ON p.product_id = s.product_id
+JOIN customers AS c
+    ON c.customer_id = s.customer_id
+JOIN city AS ci
+    ON ci.city_id =c.city_id
+GROUP BY p.product_name,ci.city_name
+ORDER BY total_sales DESC;
+
+--SubQuery
+SELECT * FROM 
+(
+SELECT ci.city_name, p.product_name,COUNT(s.sale_id) AS total_orders,
+DENSE_RANK() OVER(PARTITION BY ci.city_name ORDER BY COUNT(s.sale_id) DESC ) AS rank
+FROM products AS p
+JOIN sales AS s
+    ON p.product_id = s.product_id
+JOIN customers AS c
+    ON c.customer_id = s.customer_id
+JOIN city AS ci
+    ON ci.city_id =c.city_id
+GROUP BY 1,2
+) as t1
+WHERE rank <=3
+
+--ORDER BY 1,3 DESC
+
+
 
