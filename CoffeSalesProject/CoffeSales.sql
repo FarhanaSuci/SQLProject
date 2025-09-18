@@ -207,5 +207,31 @@ WHERE rank <=3
 
 --ORDER BY 1,3 DESC
 
+-- Q.7
+-- Customer Segmentation by City
+--1 to 14 contains coffee products
+-- How many unique customers are there in each city who have purchased coffee products?
+
+SELECT * FROM city ;
+SELECT * FROM products;
+SELECT * FROM customers;
+SELECT * FROM sales;
+
+SELECT ci.city_name,COUNT(DISTINCT c.customer_id) AS no_of_unique_customers
+FROM 
+sales  as s
+JOIN products as p
+ON s.product_id = p.product_id
+JOIN customers as c
+ON c.customer_id = s.customer_id
+JOIN city as ci
+ON c.city_id = ci.city_id
+WHERE p.product_id IN (1,2,3,4,5,6,7,8,9,10,11,12,13,14)
+GROUP BY (ci.city_name)
+ORDER BY no_of_unique_customers DESC
+
+
+
+
 
 
