@@ -138,7 +138,14 @@ JOIN
 sales AS s
 ON s.customer_id = cu.customer_id
 GROUP BY c.city_name 
-ORDER BY AVG(s.total) DESC;
+ORDER BY 3 DESC;
+
+
+
+-- -- Q.5
+-- City Population and Coffee Consumers (25%)
+-- Provide a list of cities along with their populations and estimated coffee consumers.
+-- return city_name, total current customes, estimated coffee consumers (25%)
 
 
 
@@ -147,3 +154,16 @@ SELECT * FROM city ;
 SELECT * FROM products;
 SELECT * FROM customers;
 SELECT * FROM sales;
+
+SELECT city_name,ROUND((population/1000000),2) AS Population_millions,ROUND((population*0.25)/1000000,2) AS Consumers  FROM 
+city;
+
+
+SELECT ci.city_name,ROUND((ci.population/1000000),2) As Population_millions,COUNT(DISTINCT cu.customer_id) AS current_customers, ROUND((ci.population*0.25)/1000000,2) AS 
+Consumers_millions FROM 
+city as ci 
+JOIN customers as cu
+ON ci.city_id = cu.city_id
+GROUP BY(ci.city_name,ci.population)
+
+
